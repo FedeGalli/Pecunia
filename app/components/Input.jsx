@@ -1,14 +1,15 @@
 import { React, useState } from "react"
 import { TextInput, StyleSheet } from "react-native"
 
-const InputBox = ({keyboardType}) => {
-    const [text, setText] = useState(0)
+const InputBox = ({keyboardType, placeHolder}) => {
+    const [text, setText] = useState('')
     return(
         <TextInput 
             style={styles.input}
             onChangeText={setText}
             value={text.toString()}
             keyboardType={keyboardType}
+            placeholder={placeHolder}
         />
     )
 }

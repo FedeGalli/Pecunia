@@ -1,19 +1,25 @@
-import { Link, Stack } from 'expo-router'
+import { Link, Stack, useLocalSearchParams } from 'expo-router'
 import {View, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Input from '../components/Input.jsx'
 import AddExpenseButton from '../components/AddExpenseButton.jsx'
+import { useState, useEffect } from 'react'
+import { FlatList } from 'react-native-gesture-handler'
 
 const Expense = () => {
+    const { expense } = useLocalSearchParams();
+
+    useEffect(() => {
+        if (expense) {
+          console.log(expense)
+        }
+      }, [expense]);
+
     return(
         <View style={{flex: 1}}>
             <Stack.Screen options={{
             }} />
-            <Input keyboardType={'numeric'}/>
-            <Input keyboardType={'default'}/>
-            <Link href={'/expense_list/1'}>Item 1</Link>
-            <Link href={'/expense_list/2'}>Item 2</Link>
-            <Link href={'/expense_list/3'}>Item 3</Link>
+            <Text>{expense}</Text>
+            <Link href={'/expense_list/1'}>Ciao</Link>
             <AddExpenseButton />
         </View>
     )

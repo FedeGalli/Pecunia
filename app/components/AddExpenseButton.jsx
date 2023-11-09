@@ -5,9 +5,8 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 import {AntDesign} from '@expo/vector-icons';
 
 const AddExpenseButton = () => {
-    const [text, setText] = useState('')
     return(
-        <Link href={'/expense_list/1'}>
+        <Link href={'/expense_list/AddExpensePage'}>
             <TouchableOpacity style={styles.button}>
                 <AntDesign name="plus" size={50} color="black" style={styles.icon}/>
             </TouchableOpacity>

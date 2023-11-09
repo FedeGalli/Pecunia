@@ -5,17 +5,17 @@ export default () => {
     return(
         <Tabs>
             <Tabs.Screen name={'Expense'} options={{
-                tabBarActiveTintColor: '#0094C6',
+                tabBarActiveTintColor: 'red',
                 tabBarInactiveTintColor: 'grey',
                 tabBarIcon: ({ focused}) => (
-                    <Feather name={"trending-down"} size={24} color={focused ? '#0094C6' : 'grey'} />
+                    <Feather name={"trending-down"} size={24} color={focused ? 'red' : 'grey'} />
                 )
             }}/>
             <Tabs.Screen name={'Income'} options={{
-                tabBarActiveTintColor: '#0094C6',
+                tabBarActiveTintColor: '#33cc33',
                 tabBarInactiveTintColor: 'grey',
                 tabBarIcon: ({ focused}) => (
-                    <Feather name={"trending-up"} size={24} color={focused ? '#0094C6' : 'grey'} />
+                    <Feather name={"trending-up"} size={24} color={focused ? '#33cc33' : 'grey'} />
                 )
             }}/>
         </Tabs>
