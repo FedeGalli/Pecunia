@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 export default () => {
     return(
         <Tabs>
-            <Tabs.Screen name={'Expense'} options={{
+            <Tabs.Screen name={'[Expense]'} options={{
                 tabBarActiveTintColor: 'red',
                 tabBarInactiveTintColor: 'grey',
                 tabBarIcon: ({ focused}) => (

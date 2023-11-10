@@ -2,7 +2,7 @@ import { Stack, useLocalSearchParams } from 'expo-router'
 import {View, Text } from 'react-native'
 
 
-const ExpenseListPage = () => {
+const ExpenseInfo = () => {
     const {id} = useLocalSearchParams()
 
     return (
@@ -15,4 +15,4 @@ const ExpenseListPage = () => {
     )
 }
 
-export default ExpenseListPage
+export default ExpenseInfo

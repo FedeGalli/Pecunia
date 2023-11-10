@@ -6,7 +6,7 @@ import {AntDesign} from '@expo/vector-icons';
 
 const AddExpenseButton = () => {
     return(
-        <Link href={'/expense_list/AddExpensePage'}>
+        <Link href={'/expense_list/AddExpensePage'} asChild>
             <TouchableOpacity style={styles.button}>
                 <AntDesign name="plus" size={50} color="black" style={styles.icon}/>
             </TouchableOpacity>
@@ -17,7 +17,7 @@ const AddExpenseButton = () => {
 const styles = StyleSheet.create({
     button: {
         height: 80,
-        marginTop: 430,
+        marginTop: 600,
         marginLeft: 300,
         marginRight: 30,
         alignSelf: 'left',

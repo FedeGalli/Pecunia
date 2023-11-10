@@ -3,11 +3,19 @@ import { Stack } from "expo-router"
 import SubmitButton from '../components/SubmitButton.jsx'
 import { React, useState } from "react"
 import { TextInput, StyleSheet } from "react-native"
+import * as SecureStore from 'expo-secure-store';
+
+
+async function getNumberOfItems() {
+    console.log(await this.getAllData())
+    let result = await SecureStore.getItemAsync('1')
+    return result
+  }
+
 
 const AddExpensePage = () => {
     const [amount, setAmount] = useState('')
     const [category, setCategory] = useState('')
-
 
     return(
         <View>
