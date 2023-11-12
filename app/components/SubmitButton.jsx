@@ -4,21 +4,25 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from "react-native";
 import * as SecureStore from 'expo-secure-store';
 
-async function save(value) {
-    let key = await SecureStore.getItemAsync('len')
-    console.log(key)
-    if (key) {
-        await SecureStore.setItemAsync('len', String.toString(parseInt(key, 10) + 1))
-        await SecureStore.setItemAsync(key, value);
+async function save(amount, category) {
+    
+    let result = await SecureStore.getItemAsync('0');
+    if (result) {
+        let index = (parseInt(result, 10) + 1).toString()
+        const value = JSON.stringify({index: (parseInt(result, 10) + 1), amount: amount, category: category})
+        await SecureStore.setItemAsync('0', index)
+        await SecureStore.setItemAsync(index, value)
+        alert(await SecureStore.getItemAsync(index))
+
+
+    } else {
+        const value = JSON.stringify({index: 1, amount: amount, category: category})
+        await SecureStore.setItemAsync('0', '1')
+        await SecureStore.setItemAsync('1', value)
     }
-    else {
-        await SecureStore.setItemAsync('len', '0')
-        await SecureStore.setItemAsync('0', value);
-    }
+
+
 }
-
-
-
 
 const SubmitButton = ({amount, category}) => {
     const router = useRouter();
@@ -26,8 +30,7 @@ const SubmitButton = ({amount, category}) => {
         <View style={styles.content}>
             <Link href={{pathname: `/(tabs)/[Expense]`, params: {amount: amount, category:category}}} style={styles.content} asChild>
                 <TouchableOpacity style={styles.button} onPress={ () => {
-                    save(JSON.stringify({amount, category}))
-                    
+                    save(parseFloat(amount), category)
                 }}>
                     <Text>Submit</Text>
                 </TouchableOpacity>

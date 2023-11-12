@@ -7,36 +7,32 @@ import { FlatList } from 'react-native-gesture-handler'
 import * as SecureStore from 'expo-secure-store';
 import { TouchableOpacity } from 'react-native'
 
-async function removeValue(key) {
-  let result = await SecureStore.getItemAsync(key);
-  if (result) {
-    alert("🔐 Removing 🔐 \n" + result);
-  } else {
-    alert('No values stored under that key.');
-  }
-
-  await SecureStore.deleteItemAsync(key)
+async function removeValue() {
+  await SecureStore.deleteItemAsync('0')
+  await SecureStore.deleteItemAsync('1')
+  await SecureStore.deleteItemAsync('2')
+  await SecureStore.deleteItemAsync('3')
+  await SecureStore.deleteItemAsync('4')
+  alert('Content deleted')
 }
 
-async function fetchExpenses() {
-  let values = []
-  const nItems = await SecureStore.getItemAsync('len')
-  let i = 0
-  if (nItems != 0) {
-    while(i <= nItems) {
-      values.push(JSON.parse(await SecureStore.getItemAsync(String.toString(i)))) 
-      i = i + 1
-    }
-    return values
-  }
-  return []
+async function getExpensesData(data) {
+  let response = await SecureStore.getItemAsync('0')
+  let i = 1
 
+  while (i <= response) {
+    data.push(JSON.parse(await SecureStore.getItemAsync(i.toString())))
+    i++
+  }
 }
 
-
-
+const data = []
+getExpensesData(data)
+//const data = getExpensesData()
 
 const Expense = () => {
+    
+    const [a, setA] = useState('0')
     //const data = fetchExpenses()
     //const [numberOfItems, setNumberOfItems] = useState(getNumberOfItems())
     //const { amount } = useLocalSearchParams();
@@ -47,12 +43,21 @@ const Expense = () => {
               headerTitle: 'Expense'
             }} />
             <TouchableOpacity onPress={ () => {
-              //removeValue(numberOfItems)
-              //setNumberOfItems(numberOfItems - 1)
+              //removeValue()
+              getNemberOfExpeneses(setA)
             }}>
-            <Text style={{fontSize:32}}>Numbers of items : {}</Text>
+            <Text style={{fontSize:16, marginBottom: 50}}>Numbers of items</Text>
             </TouchableOpacity>
-
+            <TouchableOpacity onPress={ () => {
+              removeValue()
+            }}>
+            <Text style={{fontSize:16, marginBottom: 50}}>Remove items</Text>
+            </TouchableOpacity>
+            <FlatList
+              data={data}
+              renderItem={({item}) => <Text style={{fontSize: 16}}>{item.index} {item.amount} {item.category}</Text>}
+              keyExtractor={item => item.index}
+            />
             <AddExpenseButton />
         </View>
     )

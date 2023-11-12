@@ -17,7 +17,7 @@ const AddExpenseButton = () => {
 const styles = StyleSheet.create({
     button: {
         height: 80,
-        marginTop: 600,
+        marginTop: 400,
         marginLeft: 300,
         marginRight: 30,
         alignSelf: 'left',
