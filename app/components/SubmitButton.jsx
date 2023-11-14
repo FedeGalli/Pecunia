@@ -1,5 +1,5 @@
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { Link, useRouter } from "expo-router"
+import { Link, router } from "expo-router"
 import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from "react-native";
 import * as SecureStore from 'expo-secure-store';
@@ -12,7 +12,6 @@ async function save(amount, category) {
         const value = JSON.stringify({index: (parseInt(result, 10) + 1), amount: amount, category: category})
         await SecureStore.setItemAsync('0', index)
         await SecureStore.setItemAsync(index, value)
-        alert(await SecureStore.getItemAsync(index))
 
 
     } else {
@@ -21,20 +20,19 @@ async function save(amount, category) {
         await SecureStore.setItemAsync('1', value)
     }
 
-
+    
+    //
 }
 
 const SubmitButton = ({amount, category}) => {
-    const router = useRouter();
     return(
         <View style={styles.content}>
-            <Link href={{pathname: `/(tabs)/[Expense]`, params: {amount: amount, category:category}}} style={styles.content} asChild>
-                <TouchableOpacity style={styles.button} onPress={ () => {
-                    save(parseFloat(amount), category)
-                }}>
-                    <Text>Submit</Text>
-                </TouchableOpacity>
-            </Link>
+            <TouchableOpacity style={styles.button} onPress={ async () => {
+                await save(parseFloat(amount), category)
+                router.back()
+            }}>
+                <Text>Submit</Text>
+            </TouchableOpacity>
         </View>
     )
 }
