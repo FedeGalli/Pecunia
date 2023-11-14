@@ -15,16 +15,19 @@ async function removeValue() {
   await SecureStore.deleteItemAsync('2')
   await SecureStore.deleteItemAsync('3')
   await SecureStore.deleteItemAsync('4')
-  alert('Content deleted')
+  alert('items removed')
 }
 
 async function getExpensesData() {
   data = []
   let response = await SecureStore.getItemAsync('0')
   let i = 1
-
+  
   while (i <= response) {
-    data.push(JSON.parse(await SecureStore.getItemAsync(i.toString())))
+    expenseEntry = await SecureStore.getItemAsync(i.toString())
+    if (expenseEntry){
+      data.push(JSON.parse(expenseEntry))
+    }
     i++
   }
   console.log(data)
@@ -94,7 +97,7 @@ const Expense = () => {
             </TouchableOpacity>
             <FlatList
               data={data}
-              renderItem={({item}) => <ExpenseRenderer index={item.index} amount={item.amount} category={item.category}/>}
+              renderItem={({item}) => <ExpenseRenderer index={item.index} amount={item.amount} category={item.category} timestamp={item.timestamp}/>}
               keyExtractor={item => item.index}
             />
             <AddExpenseButton />

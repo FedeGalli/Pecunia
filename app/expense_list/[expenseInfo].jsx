@@ -5,24 +5,38 @@ import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
 
 async function removeExpense(index) {
-    index = await SecureStore.getItemAsync('0')
-    //think about the index, do i really need that correspond to the expense array length? Do i just need the MAX ? 
-    //Think about because is causing a null array and exploding the app
-    await SecureStore.setItemAsync('0',(parseInt(index) - 1).toString())
+    maxLen = await SecureStore.getItemAsync('0')
+
     await SecureStore.deleteItemAsync(index.toString())
+
+    if (index === maxLen) {
+        for (i = maxLen - 1; i >= 0 ; i--) {
+            if (i === 0) {
+                await SecureStore.deleteItemAsync('0')
+            }
+
+            const item = await SecureStore.getItemAsync(i.toString())
+            if (item) {
+                console.log(item)
+                await SecureStore.setItemAsync('0', i.toString())
+                break
+            }
+        }
+    }
 }
 
 const ExpenseInfo = () => {
     const {index} = useLocalSearchParams()
     const {amount} = useLocalSearchParams()
     const {category} = useLocalSearchParams()
+    const {timestamp} = useLocalSearchParams()
 
     return (
         <View>
             <Stack.Screen options={{
                 headerTitle: `Expense detail ${index}`
             }} />
-            <Text>{index} {amount} {category}</Text>
+            <Text>{index} {amount} {category} {timestamp}</Text>
             <TouchableOpacity onPress={async () => {
                 await removeExpense(index)
                 alert('item deleted')

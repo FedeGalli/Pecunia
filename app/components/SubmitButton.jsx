@@ -9,13 +9,13 @@ async function save(amount, category) {
     let result = await SecureStore.getItemAsync('0');
     if (result) {
         let index = (parseInt(result, 10) + 1).toString()
-        const value = JSON.stringify({index: (parseInt(result, 10) + 1), amount: amount, category: category})
+        const value = JSON.stringify({index: (parseInt(result, 10) + 1), amount: amount, category: category, timestamp: new Date().toLocaleString()})
         await SecureStore.setItemAsync('0', index)
         await SecureStore.setItemAsync(index, value)
 
 
     } else {
-        const value = JSON.stringify({index: 1, amount: amount, category: category})
+        const value = JSON.stringify({index: 1, amount: amount, category: category, timestamp: new Date().toLocaleString()})
         await SecureStore.setItemAsync('0', '1')
         await SecureStore.setItemAsync('1', value)
     }
