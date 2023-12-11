@@ -4,14 +4,14 @@ import SubmitButton from '../components/SubmitButton.jsx'
 import { React, useState } from "react"
 import { TextInput, StyleSheet } from "react-native"
 
-const AddExpensePage = () => {
+const AddIncomePage = () => {
     const [amount, setAmount] = useState('')
     const [category, setCategory] = useState('')
 
     return(
         <View>
             <Stack.Screen options={{
-                headerTitle: 'New Expense'
+                headerTitle: 'New Income'
             }}/>
             <TextInput 
                 style={styles.input}
@@ -27,7 +27,7 @@ const AddExpensePage = () => {
                 keyboardType={'default'}
                 placeholder={'Category'}
             />
-            <SubmitButton amount={amount} category={category} redirectType={'expense'}/>
+            <SubmitButton amount={amount} category={category} redirectType={'income'}/>
         </View>
     )
 }
@@ -41,4 +41,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default AddExpensePage
+export default AddIncomePage

@@ -4,9 +4,15 @@ import { TextInput, StyleSheet} from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import {AntDesign} from '@expo/vector-icons';
 
-const AddExpenseButton = () => {
+const AddButton = ({redirectType}) => {
+    href = ''
+    if (redirectType === 'expense') {
+        href = '/expense_list/AddExpensePage'
+    } else if (redirectType === 'income') {
+        href = '/income_list/AddIncomePage'
+    }
     return(
-        <Link href={'/expense_list/AddExpensePage'} asChild>
+        <Link href={href} asChild>
             <TouchableOpacity style={styles.button}>
                 <AntDesign name="plus" size={50} color="black" style={styles.icon}/>
             </TouchableOpacity>
@@ -32,4 +38,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default AddExpenseButton
+export default AddButton

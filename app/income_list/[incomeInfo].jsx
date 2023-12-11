@@ -4,28 +4,28 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
 
-async function removeExpense(index) {
-    maxLen = await SecureStore.getItemAsync('e0')
+async function removeIncome(index) {
+    maxLen = await SecureStore.getItemAsync('i0')
 
-    await SecureStore.deleteItemAsync('e' + index.toString())
+    await SecureStore.deleteItemAsync('i' + index.toString())
 
     if (index === maxLen) {
         for (i = maxLen - 1; i >= 0 ; i--) {
             if (i === 0) {
-                await SecureStore.deleteItemAsync('e0')
+                await SecureStore.deleteItemAsync('i0')
             }
 
-            const item = await SecureStore.getItemAsync('e' + i.toString())
+            const item = await SecureStore.getItemAsync('i' + i.toString())
             if (item) {
                 console.log(item)
-                await SecureStore.setItemAsync('e0', i.toString())
+                await SecureStore.setItemAsync('i0', i.toString())
                 break
             }
         }
     }
 }
 
-const ExpenseInfo = () => {
+const IncomeInfo = () => {
     const {index} = useLocalSearchParams()
     const {amount} = useLocalSearchParams()
     const {category} = useLocalSearchParams()
@@ -34,11 +34,11 @@ const ExpenseInfo = () => {
     return (
         <View>
             <Stack.Screen options={{
-                headerTitle: `Expense detail ${index}`
+                headerTitle: `Income detail ${index}`
             }} />
             <Text>{index} {amount} {category} {timestamp}</Text>
             <TouchableOpacity onPress={async () => {
-                await removeExpense(index)
+                await removeIncome(index)
                 alert('item deleted')
                 router.back()
             }}>
@@ -49,4 +49,4 @@ const ExpenseInfo = () => {
     )
 }
 
-export default ExpenseInfo
+export default IncomeInfo

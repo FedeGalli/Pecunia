@@ -4,31 +4,37 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from "react-native";
 import * as SecureStore from 'expo-secure-store';
 
-async function save(amount, category) {
-    
-    let result = await SecureStore.getItemAsync('0');
+async function save(amount, category, redirectType) {
+    prefix = ''
+    if (redirectType === 'expense') {
+        prefix = 'e'
+    } else if (redirectType === 'income') {
+        prefix = 'i'
+    }
+
+    let result = await SecureStore.getItemAsync(prefix + '0');
     if (result) {
         let index = (parseInt(result, 10) + 1).toString()
         const value = JSON.stringify({index: (parseInt(result, 10) + 1), amount: amount, category: category, timestamp: new Date().toLocaleString()})
-        await SecureStore.setItemAsync('0', index)
-        await SecureStore.setItemAsync(index, value)
+        await SecureStore.setItemAsync(prefix + '0', index)
+        await SecureStore.setItemAsync(prefix + index, value)
 
 
     } else {
         const value = JSON.stringify({index: 1, amount: amount, category: category, timestamp: new Date().toLocaleString()})
-        await SecureStore.setItemAsync('0', '1')
-        await SecureStore.setItemAsync('1', value)
+        await SecureStore.setItemAsync(prefix + '0', '1')
+        await SecureStore.setItemAsync(prefix + '1', value)
     }
 
     
     //
 }
 
-const SubmitButton = ({amount, category}) => {
+const SubmitButton = ({amount, category, redirectType}) => {
     return(
         <View style={styles.content}>
             <TouchableOpacity style={styles.button} onPress={ async () => {
-                await save(parseFloat(amount), category)
+                await save(parseFloat(amount), category, redirectType)
                 router.back()
             }}>
                 <Text>Submit</Text>

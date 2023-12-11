@@ -1,30 +1,30 @@
-import { Link, Stack, useLocalSearchParams, useFocusEffect } from 'expo-router'
+import { Link, Stack, useFocusEffect } from 'expo-router'
 import {View, Text } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import AddExpenseButton from '../components/AddExpenseButton.jsx'
+import AddButton from '../components/AddButton.jsx'
 import { useState, useEffect } from 'react'
 import * as React from 'react'
 import { FlatList } from 'react-native-gesture-handler'
 import * as SecureStore from 'expo-secure-store';
 import { TouchableOpacity } from 'react-native'
-import ExpenseRenderer from '../components/ExpenseRenderer.jsx'
+import ExpenseRenderer from '../components/EntryRenderer.jsx'
+import EntryRenderer from '../components/EntryRenderer.jsx'
 
 async function removeValue() {
-  await SecureStore.deleteItemAsync('0')
-  await SecureStore.deleteItemAsync('1')
-  await SecureStore.deleteItemAsync('2')
-  await SecureStore.deleteItemAsync('3')
-  await SecureStore.deleteItemAsync('4')
+  await SecureStore.deleteItemAsync('e0')
+  await SecureStore.deleteItemAsync('e1')
+  await SecureStore.deleteItemAsync('e2')
+  await SecureStore.deleteItemAsync('e3')
+  await SecureStore.deleteItemAsync('e4')
   alert('items removed')
 }
 
 async function getExpensesData() {
   data = []
-  let response = await SecureStore.getItemAsync('0')
+  let response = await SecureStore.getItemAsync('e0')
   let i = 1
   
   while (i <= response) {
-    expenseEntry = await SecureStore.getItemAsync(i.toString())
+    expenseEntry = await SecureStore.getItemAsync('e' + i.toString())
     if (expenseEntry){
       data.push(JSON.parse(expenseEntry))
     }
@@ -39,7 +39,6 @@ async function getExpensesData() {
   }
 }
 
-//const data = getExpensesData()
 
 const Expense = () => {
     const [data, setData] = useState([])
@@ -69,23 +68,12 @@ const Expense = () => {
         };
       }, [triggerDataReload])
     )
-    //const data = fetchExpenses()
-    //const [numberOfItems, setNumberOfItems] = useState(getNumberOfItems())
-    //const { amount } = useLocalSearchParams();
-    //const { category } = useLocalSearchParams();
-    /*
 
-    */
     return(
         <View style={{flex: 1}}>
             <Stack.Screen options={{
               headerTitle: 'Expense'
             }} />
-            <TouchableOpacity onPress={ () => {
-              //removeValue()
-            }}>
-            <Text style={{fontSize:16, marginBottom: 50}}>Numbers of items</Text>
-            </TouchableOpacity>
             <TouchableOpacity onPress={
               async () => {
                 removeValue().then(() => {
@@ -97,10 +85,10 @@ const Expense = () => {
             </TouchableOpacity>
             <FlatList
               data={data}
-              renderItem={({item}) => <ExpenseRenderer index={item.index} amount={item.amount} category={item.category} timestamp={item.timestamp}/>}
+              renderItem={({item}) => <EntryRenderer index={item.index} amount={item.amount} category={item.category} timestamp={item.timestamp} redirectType={'expense'}/>}
               keyExtractor={item => item.index}
             />
-            <AddExpenseButton />
+            <AddButton redirectType={'expense'}/>
         </View>
     )
 }
