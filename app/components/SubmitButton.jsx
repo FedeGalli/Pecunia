@@ -13,15 +13,21 @@ async function save(amount, category, redirectType) {
     }
 
     let result = await SecureStore.getItemAsync(prefix + '0');
+    date = new Date()
+    day = date.getDate()
+    month = date.getMonth() + 1
+    year = date.getFullYear()
+
     if (result) {
         let index = (parseInt(result, 10) + 1).toString()
-        const value = JSON.stringify({index: (parseInt(result, 10) + 1), amount: amount, category: category, timestamp: new Date().toLocaleString()})
+        const value = JSON.stringify({index: (parseInt(result, 10) + 1), amount: amount, category: category, day: day, month: month, year: year})
         await SecureStore.setItemAsync(prefix + '0', index)
         await SecureStore.setItemAsync(prefix + index, value)
 
 
     } else {
-        const value = JSON.stringify({index: 1, amount: amount, category: category, timestamp: new Date().toLocaleString()})
+ 
+        const value = JSON.stringify({index: 1, amount: amount, category: category, day: day, month: month, year: year})
         await SecureStore.setItemAsync(prefix + '0', '1')
         await SecureStore.setItemAsync(prefix + '1', value)
     }

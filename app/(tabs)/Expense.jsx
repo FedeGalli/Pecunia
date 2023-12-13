@@ -6,7 +6,6 @@ import * as React from 'react'
 import { FlatList } from 'react-native-gesture-handler'
 import * as SecureStore from 'expo-secure-store';
 import { TouchableOpacity } from 'react-native'
-import ExpenseRenderer from '../components/EntryRenderer.jsx'
 import EntryRenderer from '../components/EntryRenderer.jsx'
 
 async function removeValue() {
@@ -30,7 +29,6 @@ async function getExpensesData() {
     }
     i++
   }
-  console.log(data)
   if (data) {
     return data
   }
@@ -39,10 +37,23 @@ async function getExpensesData() {
   }
 }
 
+function getMonthlyExpenses(data) {
+  date = new Date()
+  currentMonth = date.getMonth() + 1
+  sum = 0
+  data.forEach(element => {
+      if (element.month === currentMonth) {
+          sum += parseFloat(element.amount)
+      }
+  });
+  return sum
+}
+
 
 const Expense = () => {
     const [data, setData] = useState([])
     const [triggerDataReload, setTriggerDataReload] = useState(true)
+    const [totalMonthlyExpenses, setMonthlyExpenses] = useState(true)
 
     useFocusEffect(
       React.useCallback(() => {
@@ -53,6 +64,10 @@ const Expense = () => {
             .then((data) => {
               if (isActive) {
                 setData(data)
+
+                const totalExpenses = getMonthlyExpenses(data)
+                setMonthlyExpenses(totalExpenses)
+
                 setTriggerDataReload(false)
               }
             })
@@ -74,6 +89,7 @@ const Expense = () => {
             <Stack.Screen options={{
               headerTitle: 'Expense'
             }} />
+            <Text>Monthly incomes are: {totalMonthlyExpenses}€</Text>
             <TouchableOpacity onPress={
               async () => {
                 removeValue().then(() => {
@@ -85,7 +101,7 @@ const Expense = () => {
             </TouchableOpacity>
             <FlatList
               data={data}
-              renderItem={({item}) => <EntryRenderer index={item.index} amount={item.amount} category={item.category} timestamp={item.timestamp} redirectType={'expense'}/>}
+              renderItem={({item}) => <EntryRenderer index={item.index} amount={item.amount} category={item.category} timestamp={`${item.day}/${item.month}/${item.year}`} redirectType={'expense'}/>}
               keyExtractor={item => item.index}
             />
             <AddButton redirectType={'expense'}/>
