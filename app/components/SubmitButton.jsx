@@ -1,6 +1,5 @@
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { Link, router } from "expo-router"
-import { MaterialIcons } from '@expo/vector-icons';
+import { router } from "expo-router"
 import { StyleSheet, Text, View } from "react-native";
 import * as SecureStore from 'expo-secure-store';
 
@@ -12,7 +11,7 @@ async function save(amount, category, redirectType) {
         prefix = 'i'
     }
 
-    let result = await SecureStore.getItemAsync(prefix + '0');
+    const result = await SecureStore.getItemAsync(prefix + '0');
     date = new Date()
     day = date.getDate()
     month = date.getMonth() + 1
