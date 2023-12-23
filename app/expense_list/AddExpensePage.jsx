@@ -10,11 +10,11 @@ import * as SecureStore from 'expo-secure-store';
 
 async function getCategories() {
     data = []
-    let response = await SecureStore.getItemAsync('cat0')
+    let response = await SecureStore.getItemAsync('ecat0')
     let i = 1
 
     while (i <= response) {
-        category = await SecureStore.getItemAsync('cat' + i.toString())
+        category = await SecureStore.getItemAsync('ecat' + i.toString())
         if (category) {
             data.push(category)
         }
@@ -50,6 +50,7 @@ const AddExpensePage = () => {
               .then((data) => {
                 if (isActive) {
                   setAvailableCategories(data)
+                  console.log(data)
                   setTriggerDataReload(false)
                 }
               })
