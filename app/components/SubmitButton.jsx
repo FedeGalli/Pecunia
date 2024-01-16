@@ -1,7 +1,7 @@
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { router } from "expo-router"
 import { StyleSheet, Text, View } from "react-native";
 import * as SecureStore from 'expo-secure-store';
+import { Keyboard } from "react-native";
 
 async function save(amount, category, redirectType) {
     prefix = ''
@@ -30,17 +30,26 @@ async function save(amount, category, redirectType) {
         await SecureStore.setItemAsync(prefix + '0', '1')
         await SecureStore.setItemAsync(prefix + '1', value)
     }
-
-    
-    //
 }
 
-const SubmitButton = ({amount, category, redirectType}) => {
+const SubmitButton = ({amount, category, redirectType, bottomSheetRef, clearSelections}) => {
     return(
-        <View style={styles.content}>
+        <View>
             <TouchableOpacity style={styles.button} onPress={ async () => {
-                await save(parseFloat(amount), category, redirectType)
-                router.back()
+                if (amount !== '' && category !== ''){
+                    Keyboard.dismiss()
+                    await save(parseFloat(amount), category, redirectType)
+                    clearSelections()
+                    bottomSheetRef.current?.collapse()
+                }
+                else {
+                    if (amount === '' && category === '')
+                        alert(`Insert ${redirectType} amount and category !!!`)
+                    else if (amount === '')
+                        alert(`Insert ${redirectType} amount !!!`)
+                    else
+                        alert(`Insert ${redirectType} category !!!`)
+                }
             }}>
                 <Text>Submit</Text>
             </TouchableOpacity>
@@ -49,14 +58,13 @@ const SubmitButton = ({amount, category, redirectType}) => {
 }
 
 const styles = StyleSheet.create({
-    content:{
-        alignContent:'center',
-        justifyContent: 'center'
-    },
     button: {
-        backgroundColor: 'red',
-        borderRadius: 2, 
-        padding: 50
+        borderRadius: 10,
+        fontSize: 16,
+        lineHeight: 20,
+        padding: 8,
+        backgroundColor: 'grey',
+        alignSelf: 'flex-end'
     },
     icon: {
         margin: 14

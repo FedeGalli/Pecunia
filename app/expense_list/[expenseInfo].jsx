@@ -17,7 +17,6 @@ async function removeExpense(index) {
 
             const item = await SecureStore.getItemAsync('e' + i.toString())
             if (item) {
-                console.log(item)
                 await SecureStore.setItemAsync('e0', i.toString())
                 break
             }

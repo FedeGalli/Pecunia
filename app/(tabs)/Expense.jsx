@@ -1,12 +1,13 @@
-import { Link, Stack, useFocusEffect } from 'expo-router'
-import { View, Text } from 'react-native'
-import AddButton from '../components/AddButton.jsx'
-import { useState, useEffect } from 'react'
-import * as React from 'react'
+import { Stack, useFocusEffect } from 'expo-router'
+import { View, Text, StyleSheet } from 'react-native'
+import { useState, useRef, useMemo, useCallback } from 'react'
 import { FlatList } from 'react-native-gesture-handler'
 import * as SecureStore from 'expo-secure-store';
-import { TouchableOpacity } from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 import EntryRenderer from '../components/EntryRenderer.jsx'
+import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet'
+import AddExpensePage from '../expense_list/AddExpensePage.jsx'
+import CustomBackdrop from '../components/CustomBackdrop.jsx'
 
 async function removeValue() {
   await SecureStore.deleteItemAsync('e0')
@@ -14,21 +15,21 @@ async function removeValue() {
   await SecureStore.deleteItemAsync('e2')
   await SecureStore.deleteItemAsync('e3')
   await SecureStore.deleteItemAsync('e4')
-  await SecureStore.deleteItemAsync('cat0')
-  await SecureStore.deleteItemAsync('cat1')
-  await SecureStore.deleteItemAsync('cat2')
-  await SecureStore.deleteItemAsync('cat3')
-  await SecureStore.deleteItemAsync('cat4')
+  await SecureStore.deleteItemAsync('ecat0')
+  await SecureStore.deleteItemAsync('ecat1')
+  await SecureStore.deleteItemAsync('ecat2')
+  await SecureStore.deleteItemAsync('ecat3')
+  await SecureStore.deleteItemAsync('ecat4')
   alert('items removed')
 }
 
 async function getExpensesData() {
-  data = []
-  let response = await SecureStore.getItemAsync('e0')
+  const data = []
+  const response = parseInt(await SecureStore.getItemAsync('e0')) 
   let i = 1
 
   while (i <= response) {
-    expenseEntry = await SecureStore.getItemAsync('e' + i.toString())
+    const expenseEntry = await SecureStore.getItemAsync('e' + i.toString())
     if (expenseEntry) {
       data.push(JSON.parse(expenseEntry))
     }
@@ -43,9 +44,9 @@ async function getExpensesData() {
 }
 
 function getMonthlyExpenses(data) {
-  date = new Date()
-  currentMonth = date.getMonth() + 1
-  sum = 0
+  const date = new Date()
+  const currentMonth = date.getMonth() + 1
+  let sum = 0
   data.forEach(element => {
     if (element.month === currentMonth) {
       sum += parseFloat(element.amount)
@@ -56,12 +57,17 @@ function getMonthlyExpenses(data) {
 
 
 const Expense = () => {
+
+  const bottomSheetRef = useRef(null);
+  const snapPoints = useMemo(() => ['5%', '80%'], []);
+
   const [data, setData] = useState([])
   const [triggerDataReload, setTriggerDataReload] = useState(true)
   const [totalMonthlyExpenses, setMonthlyExpenses] = useState(true)
 
+
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       let isActive = true;
 
       const fetchExpenseData = async () => {
@@ -69,10 +75,8 @@ const Expense = () => {
           .then((data) => {
             if (isActive) {
               setData(data)
-
               const totalExpenses = getMonthlyExpenses(data)
               setMonthlyExpenses(totalExpenses)
-
               setTriggerDataReload(false)
             }
           })
@@ -80,8 +84,8 @@ const Expense = () => {
             console.log('error')
           })
       };
-
       fetchExpenseData();
+
 
       return () => {
         isActive = false;
@@ -90,29 +94,75 @@ const Expense = () => {
   )
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <Stack.Screen options={{
         headerTitle: 'Expense'
       }} />
-      <Text>Monthly incomes are: {totalMonthlyExpenses}€</Text>
+      <Text>Monthly expenses are: {totalMonthlyExpenses}€</Text>
+
+      <FlatList
+        data={data}
+        renderItem={({ item }) => <EntryRenderer index={item.index} amount={item.amount} category={item.category} timestamp={`${item.day}/${item.month}/${item.year}`} redirectType={'expense'} />}
+        keyExtractor={item => item.index}
+      />
+
       <TouchableOpacity onPress={
         async () => {
           removeValue().then(() => {
             setTriggerDataReload(true)
           })
         }
-
-      }>
-        <Text style={{ fontSize: 16, marginBottom: 50 }}>Remove items</Text>
+      }
+      style={{    
+        marginTop: 8,
+        marginBottom: 100,
+        borderRadius: 10,
+        fontSize: 16,
+        lineHeight: 20,
+        padding: 8,
+        backgroundColor: 'rgba(151, 151, 151, 0.25)'}}>
+      <Text>Remove items</Text>
       </TouchableOpacity>
-      <FlatList
-        data={data}
-        renderItem={({ item }) => <EntryRenderer index={item.index} amount={item.amount} category={item.category} timestamp={`${item.day}/${item.month}/${item.year}`} redirectType={'expense'} />}
-        keyExtractor={item => item.index}
-      />
-      <AddButton redirectType={'expense'} />
+
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={0}
+        snapPoints={snapPoints}
+        enablePanDownToClose={false}
+        onChange={ () => {
+          setTriggerDataReload(true)
+        }}
+        keyboardBlurBehavior='restore'
+        keyboardBehavior='extend'
+        backdropComponent={CustomBackdrop}
+        android_keyboardInputMode='adjustResize'
+      >
+        <BottomSheetView>
+          <BottomSheetView>
+            <AddExpensePage bottomSheetRef={bottomSheetRef}/>
+          </BottomSheetView>
+
+        </BottomSheetView>
+      </BottomSheet>
     </View>
   )
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex:1
+  },
+  bottomSheetTextInput : {
+    marginTop: 8,
+    marginBottom: 10,
+    borderRadius: 10,
+    fontSize: 16,
+    lineHeight: 20,
+    padding: 8,
+    backgroundColor: 'rgba(151, 151, 151, 0.25)',
+  }
+})
+
+
+//<AddButton redirectType={'expense'} />
 export default Expense

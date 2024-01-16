@@ -8,6 +8,12 @@
       "expo-router"
     ],
     "name": "Pecunia",
-    "slug": "Pecunia"
+    "slug": "Pecunia",
+    "android": {
+      "package": "com.fedegalli.Pecunia"
+    },
+    "ios": {
+      "bundleIdentifier": "com.fedegalli.Pecunia"
+    }
   }
 }

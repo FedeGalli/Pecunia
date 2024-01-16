@@ -17,7 +17,6 @@ async function removeIncome(index) {
 
             const item = await SecureStore.getItemAsync('i' + i.toString())
             if (item) {
-                console.log(item)
                 await SecureStore.setItemAsync('i0', i.toString())
                 break
             }

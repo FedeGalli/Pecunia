@@ -1,6 +1,5 @@
-import { React, useState } from "react"
+import { React } from "react"
 import { Link } from "expo-router";
-import { TextInput, StyleSheet} from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import {AntDesign} from '@expo/vector-icons';
 
@@ -16,7 +15,7 @@ const NewCategoryButton = ({redirectType, onPress}) => {
             <TouchableOpacity onPress={ () => {
                 onPress()
             }}>
-                <AntDesign name="plus" size={50} color="black" />
+                <AntDesign name="plus" size={40} color="black" />
             </TouchableOpacity>
         </Link>
     )
