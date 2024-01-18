@@ -15,7 +15,7 @@ const EntryRenderer = ({index, amount, category, timestamp, redirectType}) => {
             <TouchableOpacity onPress={() => {
                 router.push({ pathname: pathName, params: { index: index, amount: amount, category: category, timestamp: timestamp }})
             }}>
-                <Text style={{fontSize: 16}}>{index} {amount} {category}</Text>
+                <Text style={{fontSize: 16}}>{amount} {category}</Text>
             </TouchableOpacity>
         </View>
     )

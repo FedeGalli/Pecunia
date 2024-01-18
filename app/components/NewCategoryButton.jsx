@@ -2,6 +2,7 @@ import { React } from "react"
 import { Link } from "expo-router";
 import { TouchableOpacity } from "react-native-gesture-handler"
 import {AntDesign} from '@expo/vector-icons';
+import { View } from "react-native-web";
 
 const NewCategoryButton = ({redirectType, onPress}) => {
     href = ''

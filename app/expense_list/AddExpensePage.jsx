@@ -14,7 +14,6 @@ async function getCategories() {
     data = []
     let response = await SecureStore.getItemAsync('ecat0')
     let i = 1
-
     while (i <= response) {
         category = await SecureStore.getItemAsync('ecat' + i.toString())
         if (category) {
@@ -76,7 +75,7 @@ const AddExpensePage = ({ bottomSheetRef }) => {
                 keyboardType={'numeric'}
                 placeholder={'Amount'}
             />
-
+            
             <NewCategoryButton redirectType={'expense'} onPress={() => {
                 setTriggerDataReload(true)
             }} />
@@ -89,7 +88,7 @@ const AddExpensePage = ({ bottomSheetRef }) => {
                 data={availableCategories}
                 renderItem={({ item }) => <CategoryEntryRenderer index={item.index} name={item.name} setCategory={setCategory} selectedCategory={category} />}
                 keyExtractor={(item) => item.index}
-
+                
             />
 
 

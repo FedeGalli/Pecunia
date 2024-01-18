@@ -18,7 +18,7 @@ const CategoryEntryRenderer = ({index, name, setCategory, selectedCategory}) => 
                 setCategory(name)
                 setIsBold(true)
             }}>
-                <Text style={{fontSize: 20, fontWeight: isBold ? 'bold' : 'normal'}}>{index} {name}</Text>
+                <Text style={{fontSize: 20, fontWeight: isBold ? 'bold' : 'normal'}}>{name}</Text>
             </TouchableOpacity>
         </View>
     )
