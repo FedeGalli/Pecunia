@@ -141,6 +141,16 @@ async function removeExpense(index: any, type: any) {
     }
   }
 }
+const fetchGoogleData = async () => {
+  try{
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1BiL9j2IgDckI9FfMjmeqW9fDMXs9QeLzU3UHk934dGA/values/A3`)
+    const data = await res.json()
+    console.log(data)
+    
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 
 export default function TabOneScreen() {
@@ -314,6 +324,13 @@ export default function TabOneScreen() {
             style={styles.add_button}
           >
             <Text style={{ fontSize: 30 }}>  + Add  </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={fetchGoogleData}
+            style={styles.add_button}
+          >
+            <Text style={{ fontSize: 30 }}>  GDATA  </Text>
           </TouchableOpacity>
 
           <BottomSheetModal //list bottom tab
