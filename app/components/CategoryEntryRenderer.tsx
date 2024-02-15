@@ -11,23 +11,16 @@ async function removeCategory(index: any, type: any) {
 
     const maxLen = await SecureStore.getItemAsync(prefix + '0')
 
-    await SecureStore.deleteItemAsync(prefix + index.toString())
-
-    if (maxLen === null) {
-        return
-    }
-    if (index === maxLen) {
-        for (let i = parseInt(maxLen) - 1; i >= 0; i--) {
-            if (i === 0) {
-                await SecureStore.deleteItemAsync(prefix + '0')
-            }
-
-            const item = await SecureStore.getItemAsync(prefix + i.toString())
+    if (maxLen !== null) {
+        for (let i = index; i < maxLen; i++) {
+            const item = JSON.parse(await SecureStore.getItemAsync(prefix + (i + 1).toString()) || "")
             if (item) {
-                await SecureStore.setItemAsync(prefix + '0', i.toString())
-                break
+                await SecureStore.deleteItemAsync(prefix + (i).toString())
+                await SecureStore.setItemAsync(prefix + (i).toString(), JSON.stringify({ index: i, name: item.name, type: item.type, day: item.day, week: item.week, month: item.month, year: item.year }))
             }
         }
+        await SecureStore.setItemAsync(prefix + '0', (parseInt(maxLen) - 1).toString())
+        await SecureStore.deleteItemAsync(prefix + maxLen.toString())
     }
 }
 
@@ -57,7 +50,7 @@ const CategoryEntryRenderer = ({ index, name, type, setCategory, setReload, sele
             <TouchableOpacity
                 onPress={async () => {
                     removeCategory(index, type).then(() => {
-
+                        setCategory('')
                         setReload(true)
                     })
                 }}

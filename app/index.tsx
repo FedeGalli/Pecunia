@@ -118,38 +118,39 @@ async function removeValue() {
 
   alert('items removed')
 }
-async function removeExpense(index: any, type: any) {
+async function removeEntry(index: any) {
   const maxLen = await SecureStore.getItemAsync('0')
 
-  await SecureStore.deleteItemAsync(index.toString())
-
-  if (maxLen === null) {
-    return
-  }
-
-  if (index === maxLen) {
-    for (let i = parseInt(maxLen) - 1; i >= 0; i--) {
-      if (i === 0) {
-        await SecureStore.deleteItemAsync('0')
-      }
-
-      const item = await SecureStore.getItemAsync(i.toString())
+  if (maxLen !== null) {
+    for (let i = index; i < maxLen; i++) {
+      const item = JSON.parse(await SecureStore.getItemAsync((i + 1).toString()) || "")
       if (item) {
-        await SecureStore.setItemAsync('0', i.toString())
-        break
+        await SecureStore.deleteItemAsync((i).toString())
+        await SecureStore.setItemAsync((i).toString(), JSON.stringify({ index: i, amount: item.amount, category: item.category, day: item.day, weekDay: item.weekDay, week: item.week, month: item.month, year: item.year, type: item.type, isSync: item.isSync }))
       }
     }
+    await SecureStore.setItemAsync('0', (parseInt(maxLen) - 1).toString())
+    await SecureStore.deleteItemAsync(maxLen.toString())
   }
 }
-const fetchGoogleData = async () => {
-  try{
-    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1BiL9j2IgDckI9FfMjmeqW9fDMXs9QeLzU3UHk934dGA/values/A3`)
-    const data = await res.json()
-    console.log(data)
-    
+const fetchGoogleAPI = async (body: object, apiName: string) => {
+  let response = ""
+  try {
+    const res = await fetch(`http://192.168.1.114:8000/${apiName}/`, {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    response = await res.json()
+
   } catch (error) {
-    console.log(error)
+    return error
   }
+
+  return response
 }
 
 
@@ -237,7 +238,7 @@ export default function TabOneScreen() {
       return () => {
         isActive = false;
       };
-    }, [triggerDataReload, selectedCategory])
+    }, [triggerDataReload])
   )
 
   return (
@@ -326,13 +327,6 @@ export default function TabOneScreen() {
             <Text style={{ fontSize: 30 }}>  + Add  </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={fetchGoogleData}
-            style={styles.add_button}
-          >
-            <Text style={{ fontSize: 30 }}>  GDATA  </Text>
-          </TouchableOpacity>
-
           <BottomSheetModal //list bottom tab
             ref={bottomSheetRefList}
             index={0}
@@ -351,7 +345,7 @@ export default function TabOneScreen() {
                       handleOpenEditEntry()
                     }}
                   >
-                    <Text style={{ marginTop: 30, fontSize: 30, color: item.type === 'e' ? 'red' : 'green' }}> {item.type} {item.index} {item.week} {item.category} {item.amount}</Text>
+                    <Text style={{ marginTop: 30, fontSize: 30, color: item.type === 'e' ? 'red' : 'green' }}> {item.type} {item.index} {item.category} {item.amount}</Text>
                   </TouchableOpacity>
                 }
                 keyExtractor={(item: any) => item.index}
@@ -375,7 +369,14 @@ export default function TabOneScreen() {
               <TouchableOpacity
                 style={styles.add_button}
                 onPress={() => {
-                  handleOpenCategory()
+                  if (amount !==  '' && amount !== '0') {
+
+                    handleOpenCategory()
+                  }
+                  else{
+                    alert("Insert a number")
+                  }
+
                 }}
               >
                 <Text style={{ fontSize: 40 }}>Enter</Text>
@@ -409,28 +410,44 @@ export default function TabOneScreen() {
 
               <TouchableOpacity
                 onPress={async () => {
+                  if (category !== '' ) {
+                    handleCloseAll()
 
-                  const prefix = selectedCategory
-                  const result = await SecureStore.getItemAsync('0');
-                  const date = new Date()
-                  const day = date.getDate()
-                  const weekDay = date.getDay()
-                  const month = date.getMonth() + 1
-                  const year = date.getFullYear()
-                  const week = getWeekNumber(date)
-
-                  if (result) {
-                    let index = (parseInt(result, 10) + 1).toString()
-                    const value = JSON.stringify({ index: (parseInt(result, 10) + 1), amount: amount, category: category, day: day, weekDay: weekDay, week: week, month: month, year: year, type: prefix })
-                    await SecureStore.setItemAsync('0', index)
-                    await SecureStore.setItemAsync(index, value)
+                    const prefix = selectedCategory
+                    const result = await SecureStore.getItemAsync('0');
+                    const date = new Date()
+                    const day = date.getDate()
+                    const weekDay = date.getDay()
+                    const month = date.getMonth() + 1
+                    const year = date.getFullYear()
+                    const week = getWeekNumber(date)
+  
+                    const body = {
+                      user: "Federico",
+                      type: prefix,
+                      category: category,
+                      timestamp: "" + day + "/" + month + "/" + year,
+                      amount: amount
+                    }
+  
+                    const response = await fetchGoogleAPI(body, 'insert_entry') === '200' ? true : false
+  
+                    if (result) {
+                      let index = (parseInt(result, 10) + 1).toString()
+                      const value = JSON.stringify({ index: (parseInt(result, 10) + 1), amount: amount, category: category, day: day, weekDay: weekDay, week: week, month: month, year: year, type: prefix, isSync: response })
+                      await SecureStore.setItemAsync('0', index)
+                      await SecureStore.setItemAsync(index, value)
+                    } else {
+                      const value = JSON.stringify({ index: 1, amount: amount, category: category, day: day, weekDay: weekDay, week: week, month: month, year: year, type: prefix, isSync: response })
+                      await SecureStore.setItemAsync('0', '1')
+                      await SecureStore.setItemAsync('1', value)
+                    }
+                    setCategory('')
+                    setTriggerDataReload(true)
                   } else {
-                    const value = JSON.stringify({ index: 1, amount: amount, category: category, day: day, weekDay: weekDay, week: week, month: month, year: year, type: prefix })
-                    await SecureStore.setItemAsync('0', '1')
-                    await SecureStore.setItemAsync('1', value)
+                    alert('Select a valid category!!!')
                   }
-                  setTriggerDataReload(true)
-                  handleCloseAll()
+
                 }}
                 style={styles.button}
               >
@@ -480,11 +497,19 @@ export default function TabOneScreen() {
 
               <TouchableOpacity
                 onPress={async () => {
-                  removeExpense(selectedEntry.index, selectedEntry.type).then((data: any) => {
-                    handleCloseEditEntry()
-                    setTriggerDataReload(true)
-                  })
+                  const body = {
+                    user: "Federico",
+                    index: selectedEntry.index.toString()
+                  }
+                  try {
+                    fetchGoogleAPI(body, 'delete_entry')
+                    removeEntry(selectedEntry.index).then(() => {
+                      setTriggerDataReload(true)
+                      handleCloseEditEntry()
+                    })
+                  } catch (error) {
 
+                  }
                 }}
                 style={styles.add_button}
               >

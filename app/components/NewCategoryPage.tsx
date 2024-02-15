@@ -23,6 +23,20 @@ function getWeekNumber(d: any) {
     // Return array of year and week number
     return weekNo;
 }
+async function isDuplicate(categoryName:string, type:string) {
+    categoryName = categoryName.toLowerCase()
+    const len = parseInt(await SecureStore.getItemAsync(type + 'cat' + '0') || "");
+
+    for (let i = 1; i <= len; i++){
+        const entry = JSON.parse(await SecureStore.getItemAsync(type + 'cat' + i) || "").name.toString().toLowerCase()
+
+        if (entry === categoryName){
+            return true
+        }
+    }
+
+    return false
+}
 
 const NewCategoryPage = ({ type, dismiss, dataReaload }: any) => {
     const [newCategory, setNewCategory] = useState('')
@@ -36,26 +50,31 @@ const NewCategoryPage = ({ type, dismiss, dataReaload }: any) => {
                 placeholder={type === 'e' ? 'Insert New Expense Catogory' : 'Insert New Income Category'}
             />
             <TouchableOpacity style={styles.button} onPress={async () => {
-                const result = await SecureStore.getItemAsync(type + 'cat' + '0');
-                const date = new Date()
-                const day = date.getDate()
-                const month = date.getMonth() + 1
-                const year = date.getFullYear()
-                const week = getWeekNumber(date)
+                if (newCategory !== '' && !(await isDuplicate(newCategory, type))) {
+                    const result = await SecureStore.getItemAsync(type + 'cat' + '0');
+                    const date = new Date()
+                    const day = date.getDate()
+                    const month = date.getMonth() + 1
+                    const year = date.getFullYear()
+                    const week = getWeekNumber(date)
+    
+                    if (result) {
+                        let index = (parseInt(result, 10) + 1).toString()
+                        const value = JSON.stringify({ index: (parseInt(result, 10) + 1), name: newCategory, type: type, day: day, week: week, month: month, year: year })
+                        await SecureStore.setItemAsync(type + 'cat' + '0', index)
+                        await SecureStore.setItemAsync(type + 'cat' + index, value)
+                    }
+                    else {
+                        const value = JSON.stringify({ index: 1, name: newCategory, type: type, day: day, week: week, month: month, year: year })
+                        await SecureStore.setItemAsync(type + 'cat' + '0', '1')
+                        await SecureStore.setItemAsync(type + 'cat' + '1', value)
+                    }
+                    dataReaload(true)
+                    dismiss()
+                } else {
+                    alert('Insert a valid name')
+                }
 
-                if (result) {
-                    let index = (parseInt(result, 10) + 1).toString()
-                    const value = JSON.stringify({ index: (parseInt(result, 10) + 1), name: newCategory, type: type, day: day, week: week, month: month, year: year })
-                    await SecureStore.setItemAsync(type + 'cat' + '0', index)
-                    await SecureStore.setItemAsync(type + 'cat' + index, value)
-                }
-                else {
-                    const value = JSON.stringify({ index: 1, name: newCategory, type: type, day: day, week: week, month: month, year: year })
-                    await SecureStore.setItemAsync(type + 'cat' + '0', '1')
-                    await SecureStore.setItemAsync(type + 'cat' + '1', value)
-                }
-                dataReaload(true)
-                dismiss()
             }}>
                 <Text>Submit</Text>
             </TouchableOpacity>
@@ -71,9 +90,9 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     button: {
-        backgroundColor: 'red',
+        backgroundColor: '#fcba03',
         borderRadius: 2,
-        padding: 50
+        padding: 20
     },
 })
 
