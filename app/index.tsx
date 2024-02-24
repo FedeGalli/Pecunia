@@ -1,6 +1,6 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React, { useRef, useState, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, Button, Switch, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Button, Switch, Dimensions,TextInput } from 'react-native';
 import BottomSheet, { TouchableOpacity } from '@gorhom/bottom-sheet'
 import SwitchSelector from './components/SwitchSelector';
 import NumPad from './components/NumPad';
@@ -162,16 +162,19 @@ export default function TabOneScreen() {
   const [triggerDataReload, setTriggerDataReload] = useState(true)
   const [availableCategories, setAvailableCategories] = useState([])
   const [selectedCategory, setSelectedCategory] = useState('e')
+  const [description, setDescription] = useState('')
   const [incomeExpenseData, setIncomeExpenseData] = useState([])
   const [groupedIncomeExpenseData, setGroupedIncomeExpenseData] = useState([0])
 
   const bottomSheetRefNumPad = useRef<BottomSheetModal>(null);
+  const bottomSheetEntryStatus = useRef<BottomSheetModal>(null);
   const bottomSheetRefCategory = useRef<BottomSheetModal>(null);
   const bottomSheetRefNewCategory = useRef<BottomSheetModal>(null);
   const bottomSheetRefEditCategory = useRef<BottomSheetModal>(null);
   const bottomSheetRefList = useRef<BottomSheetModal>(null);
   const bottomSheetRefEditEntry = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['95%'], []);
+  const statusSnapPoints = useMemo(() => ['25%'], []);
 
   const handleOpenNumPad = useCallback(() => {
     bottomSheetRefNumPad.current?.present();
@@ -187,6 +190,12 @@ export default function TabOneScreen() {
   }, [])
   const handleOpenNewCategory = useCallback(() => {
     bottomSheetRefNewCategory.current?.present();
+  }, [])
+  const handleOpenEntryStatus = useCallback(() => {
+    bottomSheetEntryStatus.current?.present();
+  }, [])
+  const handleCloseEntryStatus = useCallback(() => {
+    bottomSheetEntryStatus.current?.dismiss();
   }, [])
   const handleCloseNewCategory = useCallback(() => {
     bottomSheetRefNewCategory.current?.dismiss();
@@ -369,11 +378,11 @@ export default function TabOneScreen() {
               <TouchableOpacity
                 style={styles.add_button}
                 onPress={() => {
-                  if (amount !==  '' && amount !== '0') {
+                  if (amount !== '' && amount !== '0') {
 
                     handleOpenCategory()
                   }
-                  else{
+                  else {
                     alert("Insert a number")
                   }
 
@@ -408,9 +417,16 @@ export default function TabOneScreen() {
                 style={{ marginTop: 30 }}
               />
 
+              <TextInput
+                onChangeText={setDescription}
+                value={description}
+                keyboardType={'default'}
+                placeholder={'Insert a description (optional)'}
+              />
+
               <TouchableOpacity
                 onPress={async () => {
-                  if (category !== '' ) {
+                  if (category !== '') {
                     handleCloseAll()
 
                     const prefix = selectedCategory
@@ -421,29 +437,32 @@ export default function TabOneScreen() {
                     const month = date.getMonth() + 1
                     const year = date.getFullYear()
                     const week = getWeekNumber(date)
-  
+
                     const body = {
                       user: "Federico",
                       type: prefix,
                       category: category,
                       timestamp: "" + day + "/" + month + "/" + year,
-                      amount: amount
+                      amount: amount,
+                      description: description
                     }
-  
+
                     const response = await fetchGoogleAPI(body, 'insert_entry') === '200' ? true : false
-  
+
                     if (result) {
                       let index = (parseInt(result, 10) + 1).toString()
-                      const value = JSON.stringify({ index: (parseInt(result, 10) + 1), amount: amount, category: category, day: day, weekDay: weekDay, week: week, month: month, year: year, type: prefix, isSync: response })
+                      const value = JSON.stringify({ index: (parseInt(result, 10) + 1), amount: amount, category: category, day: day, weekDay: weekDay, week: week, month: month, year: year, type: prefix, description:description, isSync: response })
                       await SecureStore.setItemAsync('0', index)
                       await SecureStore.setItemAsync(index, value)
                     } else {
-                      const value = JSON.stringify({ index: 1, amount: amount, category: category, day: day, weekDay: weekDay, week: week, month: month, year: year, type: prefix, isSync: response })
+                      const value = JSON.stringify({ index: 1, amount: amount, category: category, day: day, weekDay: weekDay, week: week, month: month, year: year, type: prefix, description:description, isSync: response })
                       await SecureStore.setItemAsync('0', '1')
                       await SecureStore.setItemAsync('1', value)
                     }
                     setCategory('')
+                    setDescription('')
                     setTriggerDataReload(true)
+                    handleOpenEntryStatus()
                   } else {
                     alert('Select a valid category!!!')
                   }
@@ -521,6 +540,21 @@ export default function TabOneScreen() {
             </View>
           </BottomSheetModal>
 
+          <BottomSheetModal //edit entry bottom tab (todo)
+            ref={bottomSheetEntryStatus}
+            index={0}
+            snapPoints={statusSnapPoints}
+            stackBehavior='push'
+            detached={true}
+            style={styles.status_sheet_container}
+            bottomInset={46}
+            backdropComponent={renderBackdrop}
+          >
+            <View style={styles.status_content_container}>
+              <Text style={{ marginTop: 30, fontSize: 30}}> Awesome 🎉 </Text>
+            </View>
+          </BottomSheetModal>
+
 
 
         </View>
@@ -557,5 +591,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fcba03',
     marginLeft: 250,
     marginBottom: 50
-  }
+  },
+  status_sheet_container: {
+    marginHorizontal: 24
+  },
+  status_content_container: {
+    flex: 1,
+    alignItems: "center",
+  },
 });
